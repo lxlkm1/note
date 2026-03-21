@@ -9,3 +9,6 @@ tsconfig.tsbuildinfo
 private/
 .replit
 replit.nix
+cotent/**
+!cotent/Public/
+!cotent/Public/**
