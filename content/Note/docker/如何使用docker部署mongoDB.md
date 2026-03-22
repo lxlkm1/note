@@ -19,7 +19,7 @@ WiredTiger 的默认内部缓存大小为以下两者中的较大值：
 - 0.256 GB。
 我的电脑运行内存为32G,操作系统为arch linux,如果没有在docker 指定 mongo 最大可以访问的内存，mongo会占用我15GB,如果此时运行gnome桌面，chrome 浏览器，很容易导致OOM,linux 内核会杀死mongoDB,所以需要--memory参数指定mongoDB最大可以访问的内存
 ### 参考链接
-1.[WiredTiger机制]([https://www.google.com](https://www.mongodb.com/docs/manual/core/wiredtiger/))
+1.[WiredTiger机制](https://www.mongodb.com/docs/manual/core/wiredtiger/)
 
 ## 解释
 
