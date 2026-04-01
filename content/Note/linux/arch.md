@@ -4,10 +4,17 @@
 
 解决方案:
 
-s1
+
 ```bash
 search--file /grub/grub.cfg --set=root #每个系统的grub配置文件位置不一样configfile /boot/grub/grub.cfg
 ```
 
-s2
 按F10(每个电脑不一样)，进入bios 关闭安全启动
+
+# 常用指令
+
+## 更新全部软件
+
+```bash
+sudo pacman -Syu
+```
