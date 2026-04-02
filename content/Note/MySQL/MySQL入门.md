@@ -27,14 +27,16 @@ show databases; // 不要丢失最后的s
 ```
 
 ## 创建数据库
-### 陷进
+
+### 陷阱
 1. 数据库名字不区分大小写，不要创建重复数据库
 ```SQLBash
-create database [database_name]; // 不要丢失最后的s
+create database [database_name]; 
 ```
 
 ## 选择数据库
 ### 解释
+
 1. 后面的操作默认基于此数据库
 ```SQLBash
 use [database_name]; 
