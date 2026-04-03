@@ -26,6 +26,13 @@ exit
 show databases; // 不要丢失最后的s
 ```
 
+## 查看表结构
+
+```sql
+DESC [table_name];
+```
+
+
 ## 创建数据库
 
 ### 陷阱
