@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; color: #333; background: transparent; }
+        .controls { margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px; border: 1px solid #ddd; }
+        .node-container { display: flex; border: 3px solid #444; border-radius: 8px; overflow: hidden; max-width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .pointer { background: #ffebee; color: #c62828; padding: 15px 20px; font-weight: bold; border-right: 1px solid #444; flex-grow: 1; text-align: center; }
+        .key { background: #e0f7fa; color: #006064; padding: 15px 30px; border-right: 1px solid #444; flex-grow: 2; text-align: center; }
+        .pointer:last-child { border-right: none; } /* 去掉最后一个指针的右边框 */
+        input[type=range] { width: 200px; cursor: pointer; }
+        .stats { margin-top: 10px; font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label><strong>调整 B 树阶数 (m) : </strong> <input type="range" id="m-slider" min="3" max="8" value="4"></label>
+        <span id="m-val" style="font-weight:bold; font-size:1.2em; color:#1976d2; margin-left: 10px;">4</span>
+        <div class="stats">
+            最大元素数: <span id="key-count">3</span> | 最大指针数: <span id="ptr-count">4</span>
+        </div>
+    </div>
+    
+    <div id="viz" class="node-container"></div>
+
+    <script>
+        const slider = document.getElementById('m-slider');
+        const viz = document.getElementById('viz');
+        const mVal = document.getElementById('m-val');
+        const keyCount = document.getElementById('key-count');
+        const ptrCount = document.getElementById('ptr-count');
+
+        // 核心渲染逻辑：根据 m 的值，动态生成 DOM 元素
+        function renderNode() {
+            const m = parseInt(slider.value);
+            mVal.innerText = m;
+            keyCount.innerText = m - 1;
+            ptrCount.innerText = m;
+            
+            viz.innerHTML = ''; // 清空容器
+            
+            // 循环生成交替的 指针(P) 和 元素(Key)
+            for(let i = 0; i < m; i++) {
+                // 1. 永远先插入一个指针 (P)
+                let p = document.createElement('div');
+                p.className = 'pointer'; 
+                p.innerText = 'P' + (i + 1);
+                viz.appendChild(p);
+                
+                // 2. 只要不是最后一个指针，就插入一个元素 (Key) 充当隔板
+                if(i < m - 1) {
+                    let k = document.createElement('div');
+                    k.className = 'key'; 
+                    k.innerText = 'Key ' + (i + 1);
+                    viz.appendChild(k);
+                }
+            }
+        }
+
+        // 监听滑块事件并初始化
+        slider.addEventListener('input', renderNode);
+        renderNode();
+    </script>
+</body>
+</html>
