@@ -11,7 +11,7 @@
 
 #### 1.1.1.1获取时间
 
-```SQL
+```sql
 /*
 * @fuction:获取系统当前时间，包括小时和分钟秒
 *
@@ -27,7 +27,7 @@ CURDATE()
 
 1. 时间可以直接使用 > < = 符号直接比较
 2. 比较日期差可以使用DATEDIFF() 函数去比较
-```SQL
+```sql
 # 返回date_1 - date_2的天数
 DATEDIFF([date_1], [date_2])  
 # 返回time_1 - time_2的时间差，时间差距小于24h使用
@@ -39,7 +39,7 @@ TIMEDIFF([time_1], [time_2])
 
 #### 1.1.2.1连接字符串
 
-```SQL
+```sql
 CONCATE([str_1]， [str_2], [str_3] ....)
 
 # 每个字符中间加入x
@@ -48,14 +48,14 @@ CONCATE_W([str_1]， [str_2], [str_3] ...., x)
 
 #### 1.1.2.2大小写转换
 
-```SQL
+```sql
 LOWER()
 UPPER()
 ```
 
 #### 1.1.2.3获取字符串长度
 
-```SQL
+```sql
 # 和字符集有关系
 LENGTH() 
 # 和字符集没有关系，推荐中文使用
@@ -65,7 +65,7 @@ CHAR_LENGTH()
 
 #### 1.1.2.4获取字符串长度
 
-```SQL
+```sql
 # 和字符集有关系
 LENGTH() 
 # 和字符集没有关系，推荐中文使用
@@ -75,7 +75,7 @@ CHAR_LENGTH()
 
 #### 1.1.2.5处理字符串空格
 
-```SQL
+```sql
 LTRIM()
 RTRIM()
 TRIM()
@@ -83,7 +83,7 @@ TRIM()
 
 #### 1.1.2.6替换字符串
 
-```SQL
+```sql
 # 使用b 替代s1出现的a
 REPLACE(s1， a, b)
 ```
@@ -91,7 +91,7 @@ REPLACE(s1， a, b)
 
 ### 1.1.3 流程控制
 
-```SQL
+```sql
 # 如果val_1 为 true 就返回 [val_2] 否则 val_3
 IF([val_1], [val_2], [val_3])
 
@@ -104,7 +104,7 @@ IFNULL([val_1], [val_2])
 
 ## 2.1常用函数
 
-```SQL
+```sql
 # 获取参数中最小的值
 MIN([val_1],[val_2]...)
 
@@ -123,7 +123,7 @@ COUNT([col_name])
 
 
 
-```SQL
+```sql
 # 分组查询常搭配 sql 函数，常用于完成获取一些部门平均的工资等等任务
 SELECT [col_1] [sql_fuc]([col_2])
 FROM [table_name]

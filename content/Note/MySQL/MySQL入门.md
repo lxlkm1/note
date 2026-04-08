@@ -1,4 +1,4 @@
-
+#sql基本
 
 ## 数据类型
 
@@ -17,13 +17,14 @@
 mysql -u root -p
 ```
 ## 命令行退出
-```SQLBash
+```bash
 exit
 ```
 
 ## 查看数据库
-```SQLBash
-show databases; // 不要丢失最后的s
+```sql
+ # 不要丢失最后的s
+show databases;
 ```
 
 ## 查看表结构
@@ -37,7 +38,7 @@ DESC [table_name];
 
 ### 陷阱
 1. 数据库名字不区分大小写，不要创建重复数据库
-```SQLBash
+```sql
 create database [database_name]; 
 ```
 
@@ -45,19 +46,19 @@ create database [database_name];
 ### 解释
 
 1. 后面的操作默认基于此数据库
-```SQLBash
+```sql
 use [database_name]; 
 ```
 
 ## 查看表格
 
-```SQLBash
+```sql
 show tables; 
 ```
 
 ## 创建表格
 
-```SQLBash
+```sql
 create table [table_name](
 [col_name] [data_type]
 ...
@@ -66,28 +67,28 @@ create table [table_name](
 
 ## 查询数据
 
-```SQLBash
+```sql
 select * from [table_name]
 ```
 
 ### 插入数据
-```SQLBash
+```sql
 insert into stu([col_name_1], [col_name_2]) values([row_val_1],[row_val_2]);
 ```
 
 ### 删除数据表
-```SQLBash
+```sql
 drop table [table_name];
 ```
 
 ### 删除数据库
-```SQLBash
+```sql
 drop database [database_name];
 ```
 
 ## 重置root用户密码
 
-```Bash
+```bash
 mysqld --console --skip-grant-tables --shared-memory # 使用管理员权限
 ```
 
