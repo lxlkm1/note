@@ -31,13 +31,13 @@ _> 注意点：AUTO_INCREMENT、NOT NULL 和 DEFAULT 在 MySQL 的底层实现�
 
 **1.1.3.1 查看约束信息**
 
-```SQL
+```sql
 SELECT * FROM information_schema.table_constraints WHERE table_name = '你的表名';
 ```
 
 **1.1.3.2 增加约束（建表阶段）**
 
-```SQL
+```sql
 -- 推荐规范：先定义所有列及其固有属性，最后在表级统一声明约束
 CREATE TABLE [table_name] (
     [col_1] INT NOT NULL AUTO_INCREMENT,  -- NOT NULL 和自增只能写在列级
@@ -65,7 +65,7 @@ _> 注意点：主键约束在一张表中只能存在一个。虽然通过 CONS
 
 **1.1.3.3 增加约束（建表后使用 ALTER）**
 
-```SQL
+```sql
 -- 统一使用表级约束语法 (ADD CONSTRAINT)
 ALTER TABLE [table_name]
 ADD CONSTRAINT [自定义约束名] UNIQUE (col_1, col_2);
@@ -80,7 +80,7 @@ ADD CONSTRAINT [自定义检查名] CHECK (col_1 >= 18 AND col_1 <= 65);
 
 **1.1.3.4 删除约束**
 
-```SQL
+```sql
 -- 删除主键 (因为表里只有一个主键，不需要指定名字)
 ALTER TABLE [table_name] 
 DROP PRIMARY KEY;
@@ -124,7 +124,7 @@ _> 视图就是把其他表的数据拼接成一张非真实存在的表，因�
 
 **1.2.2.1 创建视图**
 
-```SQL
+```sql
 
 CREATE VIEW [view_name] AS SELECT * FROM [table_name];
 
@@ -141,7 +141,7 @@ _>  和查询table 没有区别
 
 **1.2.2.3 查看视图结构**
 
-```SQL
+```sql
 DESC [view_name];
 ```
 
@@ -150,12 +150,12 @@ DESC [view_name];
 _> 修改视图数据方式和修改表没有区别，在一些情况下视图不能被修改，比如创建视图使用了聚合函数的情况下，还有一些其他情况
 
 **1.2.2.5 修改视图**
-```SQL
+```sql
 CREATE OR REPLACE [view_name] AS [查询语句];
 ```
 
 **1.2.2.6 删除视图**
-```SQL
+```sql
 DROP VIEW IF EXISTS [view_name];
 ```
 
@@ -170,7 +170,7 @@ _> 存储过程就是把提前写好的常用sql语句提前放置在指定数�
 
 **1.3.2.1 创建存储过程**
 
-```SQL
+```sql
 -- 推荐加上
 DROP PROCEDURE IF EXISTS [procedure_name];
 -- 使用 $ 代替sql语句结束符号
@@ -196,7 +196,7 @@ _> 参数名字不要和字段有重复
 
 **1.3.2.1 调用存储过程**
 
-```SQL
+```sql
 CALL [procedure_name] ([参数])
 
 --example
@@ -214,7 +214,7 @@ SELECT @msg;
 
 **1.4.1.1 创建存储函数**
 
-```SQL
+```sql
 -- 推荐加上
 DROP FUNCTION IF EXISTS [function_name];
 -- 使用 $ 代替sql语句结束符号
@@ -240,12 +240,14 @@ DELIMITER ;
 ```
 _> 函数外面的return 要加上s, 返回数据类型，这里不需要指定参数类型IN OUT等等
 
-**1.3.2.1 调用存储函数**
+**1.4.2.1 调用存储函数**
 
-```SQL
+```sql
 --和sql 普通函数一样
 
 --example
 SET @dept_id := 50;
 SELECT count_by_id(@dept_id);
 ```
+
+
