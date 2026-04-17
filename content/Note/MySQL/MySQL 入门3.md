@@ -1,211 +1,202 @@
 
-#MySQL函数 #聚和函数 #子表查询
-
+#MySQL #数据库 #后端
 
 # 1 MySQL函数
 
+## 1.1 常用函数
 
-## 1.1 常用
+### 1.1.1 时间处理
 
-### 1.1.1时间
-
-#### 1.1.1.1获取时间
-
-```sql
-/*
-* @fuction:获取系统当前时间，包括小时和分钟秒
-*
-*/
-NOW() 
-/*
-* @fuction:获取系统当前时间，不包括小时和分钟秒
-*
-*/
-CURDATE()
-```
-#### 1.1.1.2处理时间
-
-1. 时间可以直接使用 > < = 符号直接比较
-2. 比较日期差可以使用DATEDIFF() 函数去比较
-```sql
-# 返回date_1 - date_2的天数
-DATEDIFF([date_1], [date_2])  
-# 返回time_1 - time_2的时间差，时间差距小于24h使用
-TIMEDIFF([time_1], [time_2])  
-```
-
-
-### 1.1.2 字符串
-
-#### 1.1.2.1连接字符串
+#### 1.1.1.1 获取时间
 
 ```sql
-CONCATE([str_1]， [str_2], [str_3] ....)
+-- 获取系统当前时间，包含年月日及小时分钟秒
+SELECT NOW();
 
-# 每个字符中间加入x
-CONCATE_W([str_1]， [str_2], [str_3] ...., x)
+-- 获取系统当前时间，仅包含年月日，不包含时分秒
+SELECT CURDATE();
 ```
 
-#### 1.1.2.2大小写转换
+#### 1.1.1.2 处理时间
+
+> [!tip] 最佳实践
+> 时间数据可以直接使用 `>`、 `<`、 `=` 符号进行比较。若需计算时间差，推荐使用内置的差异比较函数以确保精确度。
 
 ```sql
-LOWER()
-UPPER()
+-- 返回两个日期的天数差值：[日期_1] - [日期_2]
+DATEDIFF([日期_1], [日期_2])
+
+-- 返回两个时间的时间差：[时间_1] - [时间_2]
+-- 适用于时间差距小于 24 小时的场景
+TIMEDIFF([时间_1], [时间_2])
 ```
 
-#### 1.1.2.3获取字符串长度
+### 1.1.2 字符串操作
+
+#### 1.1.2.1 连接字符串
+
+> [!warning] 语法错误与规范
+> 原文中的 `CONCATE` 和 `CONCATE_W` 存在拼写错误，已在此修正为 MySQL 官方标准的 `CONCAT` 和 `CONCAT_WS`（With Separator）。请注意，`CONCAT_WS` 的第一个参数必须是分隔符。
 
 ```sql
-# 和字符集有关系
-LENGTH() 
-# 和字符集没有关系，推荐中文使用
-CHAR_LENGTH()
+-- 拼接多个字符串
+CONCAT([字符串_1], [字符串_2], [字符串_3], ...)
+
+-- 使用指定的分隔符在每个字符中间加入连接
+CONCAT_WS([分隔符], [字符串_1], [字符串_2], [字符串_3], ...)
 ```
 
-
-#### 1.1.2.4获取字符串长度
+#### 1.1.2.2 大小写转换
 
 ```sql
-# 和字符集有关系
-LENGTH() 
-# 和字符集没有关系，推荐中文使用
-CHAR_LENGTH()
+-- 转换为小写
+LOWER([待转换字符串])
+
+-- 转换为大写
+UPPER([待转换字符串])
 ```
 
+#### 1.1.2.3 获取字符串长度
 
-#### 1.1.2.5处理字符串空格
+> [!danger] 字符集隐患（坑点）
+> `LENGTH()` 返回的是字节数，其结果与数据库字符集强相关（例如在 UTF-8 编码中，一个中文字符通常占 3 个字节）。如果业务需求是获取实际的字符个数，特别是涉及中文处理时，务必使用 `CHAR_LENGTH()`。
 
 ```sql
-LTRIM()
-RTRIM()
-TRIM()
+-- 获取字节长度（与字符集相关）
+LENGTH([字符串])
+
+-- 获取字符长度（与字符集无关，推荐中文环境使用）
+CHAR_LENGTH([字符串])
 ```
 
-#### 1.1.2.6替换字符串
+#### 1.1.2.4 处理字符串空格
 
 ```sql
-# 使用b 替代s1出现的a
-REPLACE(s1， a, b)
+-- 去除左侧空格
+LTRIM([待处理字符串])
+
+-- 去除右侧空格
+RTRIM([待处理字符串])
+
+-- 去除两侧所有空格
+TRIM([待处理字符串])
 ```
 
+#### 1.1.2.5 替换字符串
+
+```sql
+-- 在 [原字符串] 中查找并使用 [新字符] 替代出现的所有 [被替换字符]
+REPLACE([原字符串], [被替换字符], [新字符])
+```
 
 ### 1.1.3 流程控制
 
 ```sql
-# 如果val_1 为 true 就返回 [val_2] 否则 val_3
-IF([val_1], [val_2], [val_3])
+-- 如果 [条件表达式] 为 TRUE 就返回 [真值结果]，否则返回 [假值结果]
+IF([条件表达式], [真值结果], [假值结果])
 
-# 如果val_1 不为 NULL 就返回val_1, 否则val_2,通常把NULL 换成 0
-IFNULL([val_1], [val_2])
+-- 如果 [待判定值] 不为 NULL 就返回 [待判定值]，否则返回 [默认值]（通常用于将 NULL 换成 0）
+IFNULL([待判定值], [默认值])
 ```
 
-# 2 聚和函数
+# 2 聚合函数
 
-
-## 2.1常用函数
+## 2.1 常用函数
 
 ```sql
-# 获取参数中最小的值
-MIN([val_1],[val_2]...)
+-- 获取参数列中的最小值
+MIN([目标列])
 
-# 获取参数中最大的值
-MAX([val_1],[val_2]...)
+-- 获取参数列中的最大值
+MAX([目标列])
 
-# 获取参数中平均值
-AVG([val_1],[val_2]...)
+-- 获取参数列中的平均值
+AVG([目标列])
 
-# 获取col_name 不为空的记录数量
-COUNT([col_name])
-
+-- 获取 [目标列] 中值不为 NULL 的记录数量
+COUNT([目标列])
 ```
 
 ## 2.2 分组查询
 
-
+> [!info] 语法约束
+> 分组查询常搭配聚合函数使用，常用于完成“获取各部门平均工资”等统计任务。`HAVING` 子句的过滤机制类似于 `WHERE`，但其核心区别在于：`HAVING` 用于约束且仅能约束分组之后的聚合数据。
 
 ```sql
-# 分组查询常搭配 sql 函数，常用于完成获取一些部门平均的工资等等任务
-SELECT [col_1] [sql_fuc]([col_2])
-FROM [table_name]
-GROUP BY
-[col_x]
-# having 类似于where,但是having是约束分组之后的数据，比如过滤掉一些平均工资高于多少的部门
-HAVING []
+SELECT [分组列], [聚合函数]([统计列])
+FROM [表名]
+GROUP BY [分组列]
+HAVING [聚合后的过滤条件];
 ```
 
-# 3子表查询
+# 3 子表查询（子查询）
 
+## 3.1 抽象概念
 
-##  3.1抽象
-
-
-想象一下在一张员工表，我需要查询king的下属的信息，那正常情况下，我们需要经过两次查询，写两次查询语句，第一次查询king的员工id，然后根据king的员工id去查询他的下属，子表查询就是写一次查询语句即可
+> [!note] 知识点标签：#分类/查询思想
+> **为什么需要子查询？** > 想象在员工表中，需要查询 King 的下属信息。常规情况下需要两次独立查询：第一次查出 King 的 `[员工ID]`，第二次再根据该 `[员工ID]` 去查其下属。子查询的思想就是通过语句嵌套，一次性完成上述两步操作。
 
 ```sql
-# 假设返回king_employee_id
-SELECT e.employee_id FROM employees e where e.last_name = 'king';
-SELECT * FROM employees e where e.manager_id = king_employee_id;
+-- 常规分离查询逻辑演示（非执行代码）
+SELECT e.employee_id FROM employees e WHERE e.last_name = 'king';
+SELECT * FROM employees e WHERE e.manager_id = [King的员工ID];
 
-# 使用子表查询
-SELECT * FROM employees e where e.manager_id = (
-SELECT e2.employee_id FROM employees e2 where e2.last_name = 'king'
+-- 经过重构的单次子表查询
+SELECT * FROM employees e 
+WHERE e.manager_id = (
+    SELECT e2.employee_id FROM employees e2 WHERE e2.last_name = 'king'
 );
-
 ```
 
-## 3.2 子表查询类型
+## 3.2 子查询类型
 
-### 3.2.1相关子查询
+> [!note] 知识点标签：#分类/子查询
+> 根据子查询的执行频次和与外层的依赖关系，主要分为以下两类：
 
-把子表放在where后面 就是相关子查询，外层查询每次查询一个数据，就要完成一次子查询，子查询要经历多次
+### 3.2.1 相关子查询
+把子查询放在 `WHERE` 后面，且子查询中引用了外层查询的字段。外层查询每检索出一条数据，就要触发并执行一次子查询，循环经历多次，性能开销通常较大。
 
-
-### 3.2.2不相关子查询
-
-把子表放在select后面 就是不相关子查询，把子查询当作一张新表，只经历一次子查询，效率比相关子查询性能更高
-
-
+### 3.2.2 不相关子查询
+把子查询放在 `SELECT` 后面或作为独立条件。由于其不依赖外层参数，底层引擎将其当作一张固定的新临时表，在整个查询生命周期中只经历一次计算，效率和性能往往高于相关子查询。
 
 ## 3.3 多行子查询
 
+### 3.3.1 抽象概念
 
-### 3.3.1抽象
-
-
-多行子查询顾名思义就是子查询的结果有多行，这个时候需要搭配 ALL, ANY 等关键词，把查询结果的多行变成单行
+> [!info] 关键词解析
+> 多行子查询顾名思义就是子查询的结果集返回了多行数据。此时不能直接使用单行比较符（如 `=` 或 `>`），需要强制搭配 `ALL` 或 `ANY` 等集合关键词，将多行结果降维匹配为单行逻辑。
 
 ```sql
-# 查询工资最高的人的信息
+-- 查询工资高于所有人的员工信息（> ALL 逻辑上等价于 > 结果集中的最大值）
 SELECT * FROM employees e
-WHERE e.salary > ALL
-(SELECT e2.salary FROM 
-employees e2);
+WHERE e.salary > ALL (
+    SELECT e2.salary FROM employees e2
+);
 
-# 查询工资不是最低的人的信息
+-- 查询工资不是最低的员工信息（> ANY 逻辑上等价于 > 结果集中的最小值）
 SELECT * FROM employees e
-WHERE e.salary > ANY
-(SELECT e2.salary FROM 
-employees e2);
+WHERE e.salary > ANY (
+    SELECT e2.salary FROM employees e2
+);
 ```
 
 # 4 EXISTS 和 NOT EXISTS 的使用
 
-## 4.1抽象
+## 4.1 抽象概念
 
-如果在我们不关注子表查询的具体数据，而在在意子表查询是否有结果，就引入了 EXIST, 这通常搭配相关子查询
+> [!tip] 适用场景与最佳实践
+> 如果我们在业务层面**不关注子查询的具体数据值**，而仅仅在意**子查询是否能匹配出结果（TRUE/FALSE）**，就应该引入 `EXISTS`。该关键字通常与“相关子查询”强绑定。同时推荐在 SELECT 中写入 `1` 而不是 `*`，虽然现代优化器会忽略字段，但 `SELECT 1` 在语义上更严谨。
 
 ```sql
-
-# 查询有领导的员工信息,这种写法仅仅展示
+-- 查询有手下员工的管理者信息
 SELECT * FROM employees e
-WHERE EXISTS
-(SELECT * FROM 
-employees e2 WHERE e.manager_id = e2.employee_id);
+WHERE EXISTS (
+    SELECT 1 FROM employees e2 WHERE e.manager_id = e2.employee_id
+);
 
-
-# 查询无领导的员工信息,这种写法仅仅展示
+-- 查询没有手下员工的底层员工信息
 SELECT * FROM employees e
-WHERE NOT EXISTS
-(SELECT * FROM 
-employees e2 WHERE e.manager_id = e2.employee_id);
-
+WHERE NOT EXISTS (
+    SELECT 1 FROM employees e2 WHERE e.manager_id = e2.employee_id
+);
+```

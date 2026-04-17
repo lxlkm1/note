@@ -1,221 +1,216 @@
 
-#多表查询 #连接 #查询运算 #分页查询 
+#MySQL #数据库 #后端
 
-# 1规范
+# 1 规范
 
-sql 语句统一 关键词区别大写，表名等全部使用下划线加小写字母
+> [!tip] 最佳实践
+> SQL 语句统一规范：SQL 关键字建议全部大写，表名、列名等标识符全部使用小写字母加下划线（Snake Case）命名，以提高代码可读性和跨平台兼容性。
 
-# 2查询进阶
+# 2 查询进阶
 
-
-## 2.1别名
+## 2.1 别名
 
 ```sql
-SELECT [col_name] FROM [table_name] AS [other_name] WHERE []; # AS 后面是表别名
+-- AS 关键字用于为列或表指定别名，提升可读性
+SELECT [列名] FROM [表名] AS [表别名] WHERE [条件表达式];
 ```
 
 ## 2.2 指定查询顺序
 
 ```sql
-SELECT [col_name] FROM [table_name] AS [other_name] WHERE [] ORDER BY 
-[col_name_1] DESC,[col_name_2] ASC; # ORDER BY 开始指定顺序， DESC是指降顺，ASC是升序
+-- ORDER BY 用于指定结果集的排序方式
+-- DESC 表示降序（从大到小），ASC 表示升序（从小到大，默认值）
+SELECT [列名] FROM [表名] AS [表别名] WHERE [条件表达式] 
+ORDER BY [排序字段_1] DESC, [排序字段_2] ASC;
 ```
 
 ## 2.3 分页查询
 
-```sql
-SELECT [col_name] FROM [table_name] AS [other_name] WHERE [] LIMIT [start_index] [page_count]; # start_index 是指代从第几行数据的索引开始，第一个数据索引为0
+> [!warning] 语法纠错
+> 原文中的 `LIMIT [start_index] [page_count]` 缺少逗号，标准语法应为 `LIMIT [起始索引], [返回行数]`。MySQL 中第一行数据的索引为 0。
 
-SELECT [col_name] FROM [table_name] AS [other_name] WHERE [] LIMIT [page_count] OFFSET [start_index]; # start_index 是指代从第几行数据的索引开始，第一个数据索引为0
+```sql
+-- 方式一：使用逗号分隔，第一个参数是起始索引，第二个参数是返回行数
+SELECT [列名] FROM [表名] AS [表别名] WHERE [条件表达式] 
+LIMIT [起始索引], [返回行数];
+
+-- 方式二：使用 OFFSET 关键字，语义更加清晰（推荐写法）
+SELECT [列名] FROM [表名] AS [表别名] WHERE [条件表达式] 
+LIMIT [返回行数] OFFSET [起始索引];
 ```
 
 ## 2.4 查询过滤
 
 ```sql
-SELECT DISTINCT [col_name] FROM [table_name] WHERE []; # DISTINCT 会过滤相同的数据行
+-- DISTINCT 关键字会过滤掉结果集中完全相同的数据行，实现去重
+SELECT DISTINCT [列名] FROM [表名] WHERE [条件表达式];
 ```
 
 ## 2.5 常数查询
 
 ```sql
-SELECT DISTINCT [const] AS [other_name] FROM DUAL; # 不需要查表使用DUAL代替表
+-- 当查询不需要基于任何实际的表时，可以使用虚拟表 DUAL 占位
+SELECT DISTINCT [常量值] AS [别名] FROM DUAL;
 ```
 
 ## 2.6 运算查询
 
 ```sql
-SELECT DISTINCT [math] AS [other_name] FROM DUAL; # math 代表一个数学表达式
+-- 可以直接在 SELECT 子句中执行数学表达式或函数运算
+SELECT DISTINCT [数学表达式] AS [别名] FROM DUAL;
 ```
 
 # 3 运算
 
-## 3.1陷阱
-1. NULL 参与大多数运算不管结果是什么，结果往往是NULL， NULL = NULL 结果也是NULL，除了NULL IS NULL 是1 
+## 3.1 运算陷阱
+
+> [!danger] 隐患（坑点）
+> `NULL` 参与绝大多数数学或逻辑运算时，其结果往往都是 `NULL`。即使是 `NULL = NULL` 的判断，逻辑结果也是 `NULL`（非真）。唯一例外是使用专用的判空运算符 `IS NULL` 或 `<=>`。
 
 ## 3.2 判断是否为空
 
 ```sql
-SELECT [col_name] FROM [table_name] WHERE [col_name] IS NULL; #找出[col_name]属性为空的
-SELECT [col_name] FROM [table_name] WHERE [col_name] IS NOT NULL; #找出[col_name]属性不为空的
+-- 找出 [列名] 属性为 NULL 的记录
+SELECT [列名] FROM [表名] WHERE [列名] IS NULL;
+
+-- 找出 [列名] 属性不为 NULL 的记录
+SELECT [列名] FROM [表名] WHERE [列名] IS NOT NULL;
 ```
 
 ## 3.3 指定查询的范围
 
 ```sql
-SELECT [col_name] FROM [table_name] WHERE [col_name] BETWEEN [val_1] AND [VAL_2];
-# 指定[col_name] 大小范围在 [val_1] 与 [VAL_2] 之间
+-- 指定 [列名] 的值在 [起始值] 与 [结束值] 之间（包含边界）
+SELECT [列名] FROM [表名] WHERE [列名] BETWEEN [起始值] AND [结束值];
 
-SELECT [col_name] FROM [table_name] WHERE [col_name] NOT BETWEEN [val_1] AND [VAL_2];
-# 效果和上面相反
+-- 排除在 [起始值] 与 [结束值] 之间的数据
+SELECT [列名] FROM [表名] WHERE [列名] NOT BETWEEN [起始值] AND [结束值];
 
-SELECT [col_name] FROM [table_name] WHERE [col_name] IN ('[val_1]', '[val_2]');
-# 给col_name 指定一个更加具体的范围
+-- 给 [列名] 指定一个离散的、具体的值集合范围
+SELECT [列名] FROM [表名] WHERE [列名] IN ([值_1], [值_2]);
 
-SELECT [col_name] FROM [table_name] WHERE [col_name] NOT IN ('[val_1]', '[val_2]');
-# 给col_name 指定一个更加具体的范围
+-- 排除离散的具体值集合
+SELECT [列名] FROM [表名] WHERE [列名] NOT IN ([值_1], [值_2]);
 ```
+
 ## 3.4 找最大最小
 
 ```sql
-SELECT LEAST ([col_name_1],[col_name_2])  FROM [table_name] WHERE [];
-# 只显示[col_name_1],[col_name_2]中最小的属性，不是看长度，最大使用GREATEST
+-- 返回多个字段值或常量集中的最小值（需要最大值时使用 GREATEST）
+SELECT LEAST([列名_1], [列名_2]) FROM [表名] WHERE [条件表达式];
 
-SELECT LEAST (LENGTH([col_name_1]),LENGTH([col_name_2]))  FROM [table_name] WHERE [];
-# 只显示[col_name_1],[col_name_2]中最短的属性，不是看长度，最大使用GREATEST
-
-```
-## 3.5等于
-```sql
-SELECT [col_name] FROM [table_name] WHERE [col_name] = NULL;
-# 结果为空
-
-SELECT [col_name] FROM [table_name] WHERE [col_name] <=> NULL;
-# 把为NULL 全部找出来
-
-SELECT [col_name] FROM [table_name] WHERE [col_name] ！= NULL;
-# 结果为空，！=， <>表示不等于,因为和NULL参与计算没有结果
+-- 比较字符串长度并返回最短的长度数值
+SELECT LEAST(LENGTH([列名_1]), LENGTH([列名_2])) FROM [表名] WHERE [条件表达式];
 ```
 
-# 4匹配
-
-## 4.1 匹配查询
+## 3.5 判等运算
 
 ```sql
-SELECT [col_name] FROM [table_name] WHERE [col_name] LIKE '%a%'; #找出[col_name] 属性含a的， %表示匹配多个字符
+-- 结果永远为空！绝对不能使用普通的等号直接判断 NULL
+SELECT [列名] FROM [表名] WHERE [列名] = NULL;
 
-SELECT [col_name] FROM [table_name] WHERE [col_name] LIKE '_a%'; #找出[col_name] 属性第二字符含a的， _表示匹配一个字符，后面的%容易忘记
+-- 安全等于运算符（<=>），即使两端都是 NULL 也能安全返回 TRUE
+SELECT [列名] FROM [表名] WHERE [列名] <=> NULL;
+
+-- 结果永远为空！ != 或 <> 与 NULL 计算无结果，排除 NULL 必须使用 IS NOT NULL
+SELECT [列名] FROM [表名] WHERE [列名] != NULL;
 ```
 
+# 4 匹配查询
 
-# 5多表查询
+## 4.1 模糊匹配
+
+```sql
+-- 找出 [列名] 属性中包含字母 a 的记录。'%' 表示匹配任意数量的字符（包含 0 个）
+SELECT [列名] FROM [表名] WHERE [列名] LIKE '%a%';
+
+-- 找出 [列名] 属性第二个字符是 a 的记录。'_' 表示严格匹配单个占位字符，注意末尾别漏掉 '%'
+SELECT [列名] FROM [表名] WHERE [列名] LIKE '_a%';
+```
+
+# 5 多表查询
 
 ## 5.1 笛卡尔积
 
-### 5.1.1概念
+### 5.1.1 概念
 
-color = {Red, Blue}
-size = {Small, Large , X-Large}
-
-color 和 size 的笛卡尔积如下
-
-  - Red + Small
-  - Red + Large
-  - Red + X-Large
-  - Blue + Small
-  - Blue + Large
-  - Blue + X-Large
+> [!note] 知识点标签：#分类/关系代数
+> **什么是笛卡尔积？**
+> 假设集合 A（颜色）= `{Red, Blue}`，集合 B（尺寸）= `{Small, Large, X-Large}`，它们的笛卡尔积就是两个集合元素的所有可能组合（共 2 * 3 = 6 种组合）：
+> - Red + Small
+> - Red + Large
+> - ...以此类推。在 SQL 中，如果没有指定连接过滤条件，多表查询的返回结果直接就是笛卡尔积。
 
 ## 5.2 SQL 查询
 
 ### 5.2.1 执行多表查询
+
 ```sql
-
-SELECT * FROM [table_name_1] [table_name_2]; # 结果是两个表的笛卡尔积
-
-
+-- 结果是两张表所有行的交叉组合（笛卡尔积），无限制时通常伴随巨大的性能开销与脏数据
+SELECT * FROM [表_1], [表_2];
 ```
-
 
 ### 5.2.2 消除无关系的笛卡尔积
+
 ```sql
+-- 隐式连接：在 WHERE 子句中加入关联条件
+SELECT [表_1.列名] FROM [表_1], [表_2] WHERE [表_1.关联列] = [表_2.关联列];
 
-SELECT [table_name_1.col_name] FROM [table_name_1] [table_name_2] WHERE [table_name_1.col_name_1] =  [table_name_2.col_name_1];
-
-SELECT [table_name_1.col_name] FROM [table_name_1] JOIN [table_name_2] ON [table_name_1.col_name_1] =  [table_name_2.col_name_1];
-
+-- 显式连接（标准写法）：使用 JOIN ... ON 进行约束
+SELECT [表_1.列名] FROM [表_1] JOIN [表_2] ON [表_1.关联列] = [表_2.关联列];
 ```
-
 
 ### 5.2.3 别名使用（最佳实践）
 
-```sql
-/*
-* 使用别名可以使代码更加简洁
-* AS 可以省略但是最好不要省略，免得搞混
-*/
-SELECT [other_name_1.col_name] FROM [table_name_1] AS [other_name_1] JOIN [table_name_2] AS[other_name_2] ON [other_name_1.col_name_1] =  [other_name_2.col_name_1];
-```
+> [!tip] 最佳实践
+> 为表起别名不仅可以使代码更加简洁，还能避免多张表出现同名字段时的引擎歧义报错。虽然 `AS` 关键字可以省略，但在工程实践中建议保留以增加源码的自我解释性。
 
+```sql
+SELECT [别名_1.列名] 
+FROM [表_1] AS [别名_1] 
+JOIN [表_2] AS [别名_2] 
+ON [别名_1.关联列] = [别名_2.关联列];
+```
 
 ### 5.2.4 多种连接方式
 
-
 ```sql
-/*
-* @name:内连接
-* @function:给两个表指定一个字段，如果这两个表指定字段一致就拼接在一起
-*/
-SELECT [table_name_1.col_name] FROM [table_name_1] JOIN [table_name_2] ON [table_name_1.col_name_1] =  [table_name_2.col_name_1];
+-- 【内连接 (INNER JOIN)】：只返回两张表中指定关联条件匹配的交集记录
+SELECT [表_1.列名] 
+FROM [表_1] JOIN [表_2] ON [表_1.关联列] = [表_2.关联列];
 
-/*
-* @name:内连接（语法糖）
-* @function:给两个表指定一个字段(字段名必须一致)，如果这两个表指定字段一致就拼接在一起
-*/
-SELECT [table_name_1.col_name] FROM [table_name_1] JOIN [table_name_2] USING(
-col_name_1);
+-- 【内连接语法糖：USING】：当两张表的关联字段名完全一致时，可简写关联条件
+SELECT [表_1.列名] 
+FROM [表_1] JOIN [表_2] USING([同名关联列]);
 
-/*
-* @name:内连接（语法糖）
-* @function:不需要手动指定字段，默认指定两张表名字一致的字段
-*/
-SELECT [table_name_1.col_name] FROM [table_name_1] NATURAL JOIN [table_name_2];
+-- 【自然连接 (NATURAL JOIN)】：自动寻找两张表所有同名列作为关联条件（业务中极少使用，易因字段变更引发线上事故）
+SELECT [表_1.列名] 
+FROM [表_1] NATURAL JOIN [表_2];
 
-/*
-* @name:左外连接
-* @function:给两个表指定一个字段，如果这两个表指定字段一致就拼接在一起，但是左边的表会被完全保
-* 留，右边没有的部分会被拼接成NULL,右连接以右边的表为主
-*/
-SELECT [table_name_1.col_name] FROM [table_name_1] LEFT JOIN [table_name_2] ON [table_name_1.col_name_1] =  [table_name_2.col_name_1];
-
-/*
-* @name:全外连接
-* @function:给两个表指定一个字段，如果这两个表指定字段一致就拼接在一起，表的数据完全不丢失但
-* 目前MySQL 没有这个语法
-*/
-
-
+-- 【左外连接 (LEFT JOIN)】：以左表为主表，即使右表没有匹配，左表数据也会被完全保留，右表缺失字段对应的空间补齐为 NULL
+SELECT [表_1.列名] 
+FROM [表_1] LEFT JOIN [表_2] ON [表_1.关联列] = [表_2.关联列];
 ```
 
-# 6联合查询
+> [!warning] 数据库版本差异
+> **全外连接 (FULL OUTER JOIN)** 旨在保留两边表的全部数据（未匹配部分相互补 NULL）。但需要注意：**MySQL 原生不支持** 全外连接的专有关键字语法，生产中通常需要通过 `LEFT JOIN` 联合 (`UNION`) `RIGHT JOIN` 的组合变体来模拟实现。
 
+# 6 联合查询
 
 ```sql
-/*
-* @name:联合查询
-* @function:把两个表的的查询结果一起返回,默认去重，UNION ALL 表示不去重
-*/
-SELECT [table_name_1.col_name] FROM [table_name_1] WHERE [x1]
+-- 【联合查询：去重合并】
+-- 将两个结构一致的查询结果集垂直合并返回。UNION 默认会执行全局去重逻辑。
+SELECT [列名] FROM [表名] WHERE [条件表达式_1]
 UNION
-SELECT [table_name_1.col_name] FROM [table_name_1] WHERE [x2]
+SELECT [列名] FROM [表名] WHERE [条件表达式_2];
 
-
-/*
-* @name:联合查询本质
-* @function:把两个表的的查询结果一起返回
-*/
-
-SELECT [table_name_1.col_name] FROM [table_name_1] WHERE [x1] AND [x2]
-
+-- 【联合查询：不去重合并】（性能更优）
+-- UNION ALL 直接合并结果集，不执行底层去重判断操作，业务适用时应优先使用。
+SELECT [列名] FROM [表名] WHERE [条件表达式_1]
+UNION ALL
+SELECT [列名] FROM [表名] WHERE [条件表达式_2];
 ```
 
+# 7最佳实践与证据
 
+* **深分页（Deep Pagination）性能危机规避** — 当执行大跨度的分页语句如 `LIMIT 1000000, 10` 时，MySQL 引擎会被迫扫描前 1,000,010 行再丢弃前面的无效行，导致极严重的查询延迟。在系统架构层面，绝对不要暴漏超过指定深度的分页接口，底层 SQL 查询必须重构为“延迟关联分页（先基于聚簇索引查主键再 JOIN）”或“基于游标的条件流式查询（如 `WHERE id > 上一页最大ID LIMIT n`）”。 (证据：[MySQL 官方文档 - LIMIT Query Optimization 进阶策略](https://dev.mysql.com/doc/refman/8.0/en/limit-optimization.html))
