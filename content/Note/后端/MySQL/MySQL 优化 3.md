@@ -1,6 +1,6 @@
 
 
-# 1 知识回顾(demo)
+# 1 知识回顾
 
 >[!note] 回表补充
 >有的时候使用联合索引或者其他辅助索引不一定会回表，此现象叫做过覆盖索引,触发条件是需要索引至少部分生效并且where里面的条件必须只能有联合索引里面指定的key，SELECT 查询的字段，全部包含在索引中,发生覆盖索引的时候不需要回表，查询性能更高
@@ -58,8 +58,62 @@ using index
 
 using index condition(索引下推)
 
+指的是查询数据的时候本来不需要走索引的查询却走了索引，而且也不需要回表
+
 假设存在一个联合索引 key1,  key2 , key3
 key4 不在索引里面
 
-未完待续。。。。
+假设有一个sql 语句
+
+```mysql
+SELECT key1, key2 FROM tablexx WHERE key3 = xx OR key4 = xx;
+```
+
+key3 这个条件需要走索引，但是key4 只能全表扫描，所以mysql 就不如全部走全表扫描，把两个条件都检查一遍，这样还可以少一个走索引的步骤，这个会导致索引失效
+
+而
+```mysql
+SELECT key1, key2 FROM tablexx WHERE key3 = xx AND key4 = xx;
+SELECT key1, key2 FROM tablexx WHERE key3 = xx AND key2 LIKE xx;
+```
+
+本来mysql 需要两步操作，使用key3走索引和key4 去全表扫描，但是数据库却在key3走索引的时候顺便检查了AND 后面的条件，这个就是索引下推
+
+>[!note] 索引实现的其他情况
+>给索引加上like 通配符也会导致索引失效
+
+比如
+```mysql
+SELECT key1, key2 FROM tablexx WHERE key3 LIKE xx;
+```
+
+---
+
+using where
+
+表示WHERE 后面条件是非索引字段
+
+```mysql
+EXPLAIN SELECT * FROM s1 WHERE key4 = 'abc';
+```
+
+using join buffer
+
+```mysql
+EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.`common_field` = s2.`common_field`;
+```
+
+表示在进行多表连接的时候,有一张表会被全表扫描，每次扫到对应字段的值，就使用那个字段的值去另一张表去查数据，如果对应的字段没有被建立索引，那第二步骤的查询会变得很慢，于是数据库把两张表的数据放入服务器缓冲区（内存），提升查询速度
+
+using filesort
+
+表示在给查询结果排序的时候使用了非索引字段排序，在B+ 树中，数据本身就是根据索引的大小排序好了的，如果没有使用索引里面的字段排序就需要再给数据排序，在磁盘排序太慢，mysql 会在内存创建临时文件，在内存里面排序
+
+using temporary
+
+表示在分组排序时，group by  后面字段不在索引，所以数据不是按 group by 字段排好的，所以 MySQL 要先“整理”一下数据，再统计。整理过程中可能会使用临时表
+
+
+
+
 
